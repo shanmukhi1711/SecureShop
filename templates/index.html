@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Smart Shopping. Secure by Design.</h1>
+        <p>Discover premium products with industry-leading security and privacy protection.</p>
+        <div class="hero-buttons">
+            <a href="{{ url_for('main.products') }}" class="btn btn-primary btn-large">Shop Now</a>
+            <a href="{{ url_for('main.products') }}" class="btn btn-outline btn-large">Explore Products</a>
+        </div>
+    </div>
+</section>
+
+<section class="featured-products">
+    <div class="section-header">
+        <h2>FEATURED PRODUCTS</h2>
+    </div>
+    <div class="product-grid">
+        {% for product in products %}
+        <div class="product-card">
+            <div class="product-image-placeholder">
+                <i class="fas fa-box"></i>
+            </div>
+            <div class="product-info">
+                <span class="product-category">{{ product.category }}</span>
+                <h3 class="product-title">{{ product.name }}</h3>
+                <div class="product-rating">
+                    <i class="fas fa-star"></i> {{ product.rating }}
+                </div>
+                <div class="product-bottom">
+                    <span class="product-price">${{ "%.2f"|format(product.price) }}</span>
+                    <button class="btn btn-primary btn-sm"><i class="fas fa-cart-plus"></i></button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="section-header">
+        <h2>WHY SECURESHOP?</h2>
+    </div>
+    <div class="features-grid">
+        <div class="feature-card">
+            <i class="fas fa-shield-alt feature-icon"></i>
+            <h3>Secure Accounts</h3>
+            <p>Enterprise-grade security protecting your data.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-gem feature-icon"></i>
+            <h3>Quality Products</h3>
+            <p>Curated selection of premium items.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-shipping-fast feature-icon"></i>
+            <h3>Fast Ordering</h3>
+            <p>Seamless checkout experience.</p>
+        </div>
+        <div class="feature-card">
+            <i class="fas fa-lock feature-icon"></i>
+            <h3>Security Tested</h3>
+            <p>Rigorous security standards and testing.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}

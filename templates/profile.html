@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header"><h1>Profile</h1></div>
+<div class="container" style="max-width: 600px; margin: 0 auto; padding: 2rem;">
+    <form method="POST">
+        <label>Username (cannot be changed)</label>
+        <input type="text" value="{{ user.username }}" disabled style="width: 100%; margin-bottom: 1rem; padding: 0.5rem;">
+        
+        <label>Full Name</label>
+        <input type="text" name="name" value="{{ user.name }}" required style="width: 100%; margin-bottom: 1rem; padding: 0.5rem;">
+        
+        <label>Email</label>
+        <input type="email" name="email" value="{{ user.email }}" required style="width: 100%; margin-bottom: 1rem; padding: 0.5rem;">
+        
+        <button type="submit" class="btn btn-primary">Update Profile</button>
+    </form>
+</div>
+{% endblock %}

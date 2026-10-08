@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header"><h1>My Orders</h1></div>
+<div class="container" style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+    {% if orders %}
+        <table style="width: 100%; text-align: left; border-collapse: collapse;">
+            <tr><th>Order ID</th><th>Date</th><th>Total</th><th>Status</th></tr>
+            {% for order in orders %}
+            <tr style="border-bottom: 1px solid #ccc;">
+                <td style="padding: 1rem 0;">#{{ order.id }}</td>
+                <td>{{ order.created_at.strftime('%Y-%m-%d') }}</td>
+                <td>${{ "%.2f"|format(order.total) }}</td>
+                <td>{{ order.status }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>You have no orders yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

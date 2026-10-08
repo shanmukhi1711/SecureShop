@@ -1,0 +1,27 @@
+{% extends "admin/admin_base.html" %}
+{% block content %}
+<h2>Manage Orders</h2>
+<table class="admin-table" style="margin-top: 1rem;">
+    <tr><th>ID</th><th>User ID</th><th>Date</th><th>Total</th><th>Status</th><th>Action</th></tr>
+    {% for order in orders %}
+    <tr>
+        <td>#{{ order.id }}</td>
+        <td>{{ order.user_id }}</td>
+        <td>{{ order.created_at.strftime('%Y-%m-%d') }}</td>
+        <td>${{ "%.2f"|format(order.total) }}</td>
+        <td>
+            <form action="{{ url_for('admin.update_order_status', id=order.id) }}" method="POST" style="display: flex; gap: 0.5rem;">
+                <select name="status" style="padding: 0.25rem;">
+                    <option value="Processing" {% if order.status == 'Processing' %}selected{% endif %}>Processing</option>
+                    <option value="Confirmed" {% if order.status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+                    <option value="Shipped" {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
+                    <option value="Delivered" {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
+                </select>
+                <button type="submit" class="btn btn-primary btn-sm">Update</button>
+            </form>
+        </td>
+        <td>-</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

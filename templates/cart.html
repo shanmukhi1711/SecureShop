@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-header"><h1>Shopping Cart</h1></div>
+<div class="container" style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+    {% if items %}
+        <table style="width: 100%; text-align: left; border-collapse: collapse;">
+            <tr><th>Product</th><th>Price</th><th>Quantity</th><th>Total</th><th>Action</th></tr>
+            {% for item in items %}
+            <tr style="border-bottom: 1px solid #ccc;">
+                <td style="padding: 1rem 0;">{{ item.product.name }}</td>
+                <td>${{ "%.2f"|format(item.product.price) }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ "%.2f"|format(item.product.price * item.quantity) }}</td>
+                <td><a href="{{ url_for('main.remove_from_cart', item_id=item.id) }}" class="btn btn-outline btn-sm">Remove</a></td>
+            </tr>
+            {% endfor %}
+        </table>
+        <div style="text-align: right; margin-top: 2rem;">
+            <h3>Total: ${{ "%.2f"|format(total) }}</h3>
+            <a href="{{ url_for('main.checkout') }}" class="btn btn-primary btn-large">Proceed to Checkout</a>
+        </div>
+    {% else %}
+        <div style="text-align: center;">
+            <h2>Your cart is empty</h2>
+            <a href="{{ url_for('main.products') }}" class="btn btn-primary">Continue Shopping</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
