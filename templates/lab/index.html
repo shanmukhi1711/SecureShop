@@ -1,5 +1,78 @@
 {% extends "base.html" %}
+
+{% block title %}Security Laboratory - SecureShopy{% endblock %}
+
 {% block content %}
-<h2>Security Lab</h2>
-<p>Academic security laboratory module.</p>
-{% endblock %}\n
+<div class="container" style="max-width: 1000px; padding-top: 3rem; padding-bottom: 5rem;">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="{{ url_for('main.index') }}"><i class="fas fa-home"></i> Home</a>
+        <span>/</span>
+        <span style="color: var(--text-primary); font-weight: 600;">Academic Security Laboratory</span>
+    </div>
+
+    <!-- Header Banner -->
+    <div style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #ffffff; padding: 2.5rem; border-radius: var(--radius-xl); margin-bottom: 2.5rem; box-shadow: var(--shadow-md);">
+        <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(56, 189, 248, 0.15); color: #38bdf8; padding: 0.35rem 0.75rem; border-radius: var(--radius-full); font-size: 0.8125rem; font-weight: 700; margin-bottom: 1rem;">
+            <i class="fas fa-flask"></i> OWASP ZAP Security Research & Evaluation Environment
+        </div>
+        <h1 style="color: #ffffff; font-size: 2.25rem; font-weight: 800; margin-bottom: 0.75rem;">Security Lab Overview</h1>
+        <p style="color: #cbd5e1; font-size: 1rem; max-width: 680px; line-height: 1.6;">
+            This module provides authorized academic laboratory controls for vulnerability assessment, penetration testing with OWASP ZAP, session security, and defense evaluation.
+        </p>
+    </div>
+
+    <!-- Lab Modules Grid -->
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; margin-bottom: 3rem;">
+        <div style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.75rem; box-shadow: var(--shadow-xs);">
+            <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 1rem;">
+                <i class="fas fa-bug"></i>
+            </div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a;">A01: Broken Access Control</h3>
+            <p style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5; margin-bottom: 1rem;">
+                Evaluating privilege escalation boundaries between customer roles and admin dashboards via route handlers and decorators.
+            </p>
+            <span class="badge badge-green"><i class="fas fa-check"></i> Decorator Guarded</span>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.75rem; box-shadow: var(--shadow-xs);">
+            <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 1rem;">
+                <i class="fas fa-key"></i>
+            </div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a;">A07: Identification & Auth</h3>
+            <p style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5; margin-bottom: 1rem;">
+                Bcrypt credential hashing, salted password verification, session cookie flags (HttpOnly, SameSite=Lax).
+            </p>
+            <span class="badge badge-green"><i class="fas fa-check"></i> Bcrypt Salted</span>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.75rem; box-shadow: var(--shadow-xs);">
+            <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 1rem;">
+                <i class="fas fa-code"></i>
+            </div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a;">A03: Injection & ORM Testing</h3>
+            <p style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5; margin-bottom: 1rem;">
+                SQL injection mitigation via SQLAlchemy parameterized queries across products, categories, and user searches.
+            </p>
+            <span class="badge badge-green"><i class="fas fa-check"></i> Parameterized ORM</span>
+        </div>
+
+        <div style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.75rem; box-shadow: var(--shadow-xs);">
+            <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; margin-bottom: 1rem;">
+                <i class="fas fa-network-wired"></i>
+            </div>
+            <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 0.5rem; color: #0f172a;">OWASP ZAP Automated Spider</h3>
+            <p style="color: var(--text-secondary); font-size: 0.875rem; line-height: 1.5; margin-bottom: 1rem;">
+                Ready for active and passive scanning from local OWASP ZAP instances against baseline <code>http://127.0.0.1:5000</code>.
+            </p>
+            <span class="badge badge-blue"><i class="fas fa-radar"></i> Local Test Ready</span>
+        </div>
+    </div>
+
+    <div style="text-align: center;">
+        <a href="{{ url_for('main.index') }}" class="btn btn-outline btn-lg">
+            <i class="fas fa-arrow-left"></i> Return to Main Storefront
+        </a>
+    </div>
+</div>
+{% endblock %}

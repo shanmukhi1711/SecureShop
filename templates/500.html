@@ -1,8 +1,20 @@
 {% extends "base.html" %}
+
+{% block title %}500 - Internal Server Error - SecureShopy{% endblock %}
+
 {% block content %}
-<div style="text-align: center; padding: 4rem;">
-    <h1>500 - Internal Server Error</h1>
-    <p>Something went wrong on our end.</p>
-    <a href="{{ url_for('main.index') }}" class="btn btn-primary">Back to Home</a>
+<div class="container" style="max-width: 600px; margin: 5rem auto; text-align: center; padding: 0 1.5rem;">
+    <div style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 6rem; font-weight: 800; color: #cbd5e1; line-height: 1; margin-bottom: 1rem;">
+        500
+    </div>
+    <h1 style="font-size: 2rem; font-weight: 800; color: #0f172a; margin-bottom: 0.75rem;">Internal Server Error</h1>
+    <p style="color: var(--text-secondary); font-size: 1rem; line-height: 1.6; margin-bottom: 2rem;">
+        Our systems encountered an unexpected condition. Please try refreshing or return to the main storefront.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+        <a href="{{ url_for('main.index') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-home"></i> Back to Store
+        </a>
+    </div>
 </div>
 {% endblock %}

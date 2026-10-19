@@ -1,11 +1,81 @@
 {% extends "base.html" %}
+
+{% block title %}Sign In - SecureShopy{% endblock %}
+
 {% block content %}
-<div style="max-width: 400px; margin: 4rem auto; text-align: center;">
-    <h2>Welcome back</h2>
-    <form method="POST">
-        <input type="text" name="username" placeholder="Username" required style="width: 100%; margin-bottom: 1rem; padding: 0.5rem;">
-        <input type="password" name="password" placeholder="Password" required style="width: 100%; margin-bottom: 1rem; padding: 0.5rem;">
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Login</button>
-    </form>
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-header">
+            <div class="brand-icon">
+                <i class="fas fa-shield-halved"></i>
+            </div>
+            <h2>Welcome Back</h2>
+            <p>Access your SecureShopy orders, cart, and profile</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.login', next=request.args.get('next')) }}" id="loginForm">
+            <div class="form-group">
+                <label class="form-label" for="usernameInput">Username or Email</label>
+                <div style="position: relative;">
+                    <input 
+                        type="text" 
+                        name="username" 
+                        id="usernameInput" 
+                        class="form-control" 
+                        placeholder="Enter your username" 
+                        required 
+                        autofocus
+                    >
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+                    <label class="form-label" for="passwordInput" style="margin-bottom: 0;">Password</label>
+                </div>
+                <div style="position: relative;">
+                    <input 
+                        type="password" 
+                        name="password" 
+                        id="passwordInput" 
+                        class="form-control" 
+                        placeholder="Enter your password" 
+                        required
+                    >
+                </div>
+            </div>
+
+            <div style="margin-top: 1.75rem;">
+                <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;" id="loginSubmitBtn">
+                    <i class="fas fa-arrow-right-to-bracket"></i> Login
+                </button>
+            </div>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+            Don't have an account? 
+            <a href="{{ url_for('auth.register') }}" style="font-weight: 600; color: var(--primary);">Create one now</a>
+        </div>
+
+        <!-- Quick 1-Click Demo Credentials Pill Helper -->
+        <div class="demo-credentials-box">
+            <h5><i class="fas fa-key" style="color: var(--primary);"></i> Quick Test Credentials</h5>
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 0.5rem;">
+                <button type="button" class="demo-pill" onclick="fillCredentials('customer', 'Customer@123')" style="text-align: left; border: 1px solid var(--border); width: 100%;">
+                    👤 <strong>Customer:</strong> <code>customer</code> / <code>Customer@123</code>
+                </button>
+                <button type="button" class="demo-pill" onclick="fillCredentials('admin', 'Admin@123')" style="text-align: left; border: 1px solid var(--border); width: 100%;">
+                    ⚡ <strong>Admin:</strong> <code>admin</code> / <code>Admin@123</code>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+
+<script>
+function fillCredentials(u, p) {
+    document.getElementById('usernameInput').value = u;
+    document.getElementById('passwordInput').value = p;
+}
+</script>
 {% endblock %}

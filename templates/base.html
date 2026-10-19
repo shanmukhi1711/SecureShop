@@ -3,68 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SECURESHOP - Smart Shopping. Secure by Design.</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>{% block title %}SecureShopy - Premium Electronics & Smart Tech{% endblock %}</title>
+    <meta name="description" content="Discover premium electronics, smartphones, laptops, audio and smart devices with secure shopping and fast pan-India delivery.">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Stylesheet -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-container">
-            <a href="{{ url_for('main.index') }}" class="brand">SECURESHOP</a>
-            
-            <div class="nav-links">
-                <a href="{{ url_for('main.index') }}">Home</a>
-                <a href="{{ url_for('main.products') }}">Products</a>
+    <!-- Top Announcement Bar -->
+    <div class="announcement-bar">
+        <div class="bar-inner">
+            <div>
+                <span><i class="fas fa-bolt" style="color: #fbbf24; margin-right: 0.35rem;"></i> Special Tech Showcase: Free Express Delivery on orders across India</span>
             </div>
-
-            <div class="nav-actions">
-                {% if current_user.is_authenticated %}
-                    <a href="{{ url_for('main.cart') }}" class="nav-icon"><i class="fas fa-shopping-cart"></i> Cart</a>
-                    <a href="{{ url_for('main.orders') }}" class="nav-icon"><i class="fas fa-box"></i> Orders</a>
-                    <a href="{{ url_for('main.profile') }}" class="nav-icon"><i class="fas fa-user"></i> Profile</a>
-                    {% if current_user.role == 'admin' %}
-                        <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline">Admin</a>
-                    {% endif %}
-                    <a href="{{ url_for('auth.logout') }}" class="btn btn-primary">Logout</a>
-                {% else %}
-                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline">Login</a>
-                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary">Register</a>
+            <div class="bar-links">
+                <a href="{{ url_for('lab.index') }}"><i class="fas fa-shield-alt"></i> Security Lab</a>
+                {% if current_user.is_authenticated and current_user.role == 'admin' %}
+                <a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-lock"></i> Admin Portal</a>
                 {% endif %}
             </div>
         </div>
-    </nav>
+    </div>
 
+    <!-- Main Navigation Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <!-- Brand Logo -->
+            <a href="{{ url_for('main.index') }}" class="brand" id="brandLogo">
+                <div class="brand-icon">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <div class="brand-text">
+                    SECURE<span class="brand-accent">SHOPY</span>
+                </div>
+                <span class="brand-badge">PRO</span>
+            </a>
+
+            <!-- Working Search Bar -->
+            <form class="nav-search-form" action="{{ url_for('main.products') }}" method="GET" id="globalSearchForm">
+                <div class="nav-search-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input 
+                        type="text" 
+                        name="search" 
+                        id="navSearchInput"
+                        class="nav-search-input" 
+                        placeholder="Search laptops, smartphones, headphones, monitors..." 
+                        value="{{ request.args.get('search', '') }}"
+                        autocomplete="off"
+                    >
+                    <button type="submit" class="nav-search-btn" id="navSearchSubmit">Search</button>
+                </div>
+            </form>
+
+            <!-- Navigation Links -->
+            <nav>
+                <ul class="nav-menu">
+                    <li><a href="{{ url_for('main.index') }}" class="nav-link {% if request.endpoint == 'main.index' %}active{% endif %}">Home</a></li>
+                    <li><a href="{{ url_for('main.products') }}" class="nav-link {% if request.endpoint == 'main.products' and not request.args.get('category') %}active{% endif %}">Explore Store</a></li>
+                </ul>
+            </nav>
+
+            <!-- User & Cart Actions -->
+            <div class="nav-actions">
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('main.cart') }}" class="nav-action-btn nav-cart-btn" id="navCartBtn" title="Shopping Cart">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>Cart</span>
+                        <span class="cart-badge" id="navCartBadge">{{ cart_item_count|default(0) }}</span>
+                    </a>
+                    <a href="{{ url_for('main.orders') }}" class="nav-action-btn" title="My Orders">
+                        <i class="fas fa-box-archive"></i>
+                        <span>Orders</span>
+                    </a>
+                    <a href="{{ url_for('main.profile') }}" class="nav-action-btn" title="My Profile">
+                        <i class="fas fa-circle-user"></i>
+                        <span>{{ current_user.username }}</span>
+                    </a>
+                    {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline btn-sm">
+                        <i class="fas fa-gauge-high"></i> Admin
+                    </a>
+                    {% endif %}
+                    <a href="{{ url_for('auth.logout') }}" class="btn btn-outline btn-sm" id="navLogoutBtn">
+                        <i class="fas fa-arrow-right-from-bracket"></i> Logout
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('main.cart') }}" class="nav-action-btn nav-cart-btn" id="navCartBtn" title="Shopping Cart">
+                        <i class="fas fa-shopping-bag"></i>
+                        <span>Cart</span>
+                        <span class="cart-badge">{{ cart_item_count|default(0) }}</span>
+                    </a>
+                    <a href="{{ url_for('auth.login') }}" class="btn btn-outline btn-sm" id="navLoginBtn">
+                        <i class="fas fa-arrow-right-to-bracket"></i> Login
+                    </a>
+                    <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm" id="navRegisterBtn">
+                        Register
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Secondary Category Navigation Bar -->
+        <div class="category-nav-bar">
+            <div class="category-nav-container">
+                <a href="{{ url_for('main.products') }}" class="cat-nav-item"><i class="fas fa-layer-group"></i> All Tech</a>
+                <a href="{{ url_for('main.products', category='Laptops') }}" class="cat-nav-item"><i class="fas fa-laptop"></i> Laptops</a>
+                <a href="{{ url_for('main.products', category='Mobiles') }}" class="cat-nav-item"><i class="fas fa-mobile-screen"></i> Mobiles</a>
+                <a href="{{ url_for('main.products', category='Audio') }}" class="cat-nav-item"><i class="fas fa-headphones"></i> Audio</a>
+                <a href="{{ url_for('main.products', category='Monitors') }}" class="cat-nav-item"><i class="fas fa-display"></i> Monitors</a>
+                <a href="{{ url_for('main.products', category='Wearables') }}" class="cat-nav-item"><i class="fas fa-clock"></i> Wearables</a>
+                <a href="{{ url_for('main.products', category='Accessories') }}" class="cat-nav-item"><i class="fas fa-keyboard"></i> Accessories</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Global Flash Messages -->
     <div class="flash-messages">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
                     <div class="alert alert-{{ category }}">
-                        {{ message }}
+                        {% if category in ['error', 'danger'] %}
+                            <i class="fas fa-circle-exclamation"></i>
+                        {% elif category == 'success' %}
+                            <i class="fas fa-circle-check"></i>
+                        {% else %}
+                            <i class="fas fa-circle-info"></i>
+                        {% endif %}
+                        <span>{{ message }}</span>
                     </div>
                 {% endfor %}
             {% endif %}
         {% endwith %}
     </div>
 
+    <!-- Main Content Area -->
     <main class="main-content">
         {% block content %}{% endblock %}
     </main>
 
+    <!-- Professional Footer -->
     <footer class="footer">
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>SECURESHOP</h3>
-                <p>Smart Shopping. Secure by Design.</p>
+        <div class="container">
+            <div class="footer-top-grid">
+                <div class="footer-brand">
+                    <h3>
+                        <i class="fas fa-shield-halved" style="color: var(--primary);"></i>
+                        SECURESHOPY
+                    </h3>
+                    <p>
+                        Engineered for premium performance and protected by robust security standards. Discover top-tier laptops, smartphones, monitors, and audio hardware curated for creators, engineers, and everyday tech enthusiasts.
+                    </p>
+                    <div class="footer-security-note">
+                        <i class="fas fa-lock" style="color: #38bdf8;"></i>
+                        <span>256-Bit SSL Encrypted • OWASP ZAP Security Tested</span>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Shop Categories</h4>
+                    <ul>
+                        <li><a href="{{ url_for('main.products', category='Laptops') }}">Laptops & MacBooks</a></li>
+                        <li><a href="{{ url_for('main.products', category='Mobiles') }}">Smartphones & Tablets</a></li>
+                        <li><a href="{{ url_for('main.products', category='Audio') }}">Headphones & Earbuds</a></li>
+                        <li><a href="{{ url_for('main.products', category='Monitors') }}">4K & Gaming Displays</a></li>
+                        <li><a href="{{ url_for('main.products', category='Wearables') }}">Smartwatches & Fitness</a></li>
+                        <li><a href="{{ url_for('main.products', category='Accessories') }}">Keyboards, Mice & Hubs</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Customer Care</h4>
+                    <ul>
+                        <li><a href="{{ url_for('main.cart') }}">Shopping Cart</a></li>
+                        <li><a href="{{ url_for('main.orders') }}">Order Tracking</a></li>
+                        <li><a href="{{ url_for('main.profile') }}">Account Settings</a></li>
+                        <li><a href="{{ url_for('lab.index') }}">Security Lab Hub</a></li>
+                        <li><a href="{{ url_for('auth.login') }}">Member Sign In</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Secure Guarantee</h4>
+                    <ul>
+                        <li><i class="fas fa-check" style="color: var(--success); margin-right: 0.35rem;"></i> 100% Genuine Tech</li>
+                        <li><i class="fas fa-check" style="color: var(--success); margin-right: 0.35rem;"></i> 30-Day Easy Returns</li>
+                        <li><i class="fas fa-check" style="color: var(--success); margin-right: 0.35rem;"></i> Pan-India Fast Courier</li>
+                        <li><i class="fas fa-check" style="color: var(--success); margin-right: 0.35rem;"></i> Official Warranty Support</li>
+                    </ul>
+                </div>
             </div>
-            <div class="footer-section">
-                <h4>Quick Links</h4>
-                <a href="{{ url_for('main.products') }}">Products</a>
+
+            <div class="footer-bottom">
+                <div>
+                    <p>&copy; 2026 SecureShopy Inc. All rights reserved. Academic Security Engineering Project.</p>
+                </div>
+                <div class="footer-payment-methods">
+                    <span title="UPI Accepted"><i class="fas fa-qrcode"></i> UPI</span>
+                    <span title="RuPay Accepted"><i class="far fa-credit-card"></i> RuPay</span>
+                    <span title="Visa Accepted"><i class="fab fa-cc-visa"></i></span>
+                    <span title="Mastercard Accepted"><i class="fab fa-cc-mastercard"></i></span>
+                    <span title="Encrypted Connection"><i class="fas fa-shield"></i> Safe & Secure</span>
+                </div>
             </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 SecureShop. All rights reserved.</p>
         </div>
     </footer>
+
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

@@ -30,6 +30,16 @@ class Product(db.Model):
     image_url = db.Column(db.String(200))
     rating = db.Column(db.Float, default=0.0)
 
+    @property
+    def image_path(self):
+        if not self.image_url:
+            return 'images/fallback.jpg'
+        if self.image_url.startswith(('http://', 'https://')):
+            return self.image_url
+        if '/' in self.image_url:
+            return self.image_url
+        return f'images/products/{self.image_url}'
+
 class Cart(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

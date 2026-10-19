@@ -6,8 +6,23 @@ main_bp = Blueprint('main', __name__)
 
 @main_bp.route('/')
 def index():
-    products = Product.query.limit(4).all()
-    return render_template('index.html', products=products)
+    featured_products = Product.query.order_by(Product.rating.desc()).limit(8).all()
+    bestsellers = Product.query.order_by(Product.price.desc()).limit(4).all()
+    categories_data = [
+        {'name': 'Laptops', 'slug': 'Laptops', 'image': 'images/categories/laptops.jpg', 'count': Product.query.filter_by(category='Laptops').count()},
+        {'name': 'Mobiles', 'slug': 'Mobiles', 'image': 'images/categories/mobiles.jpg', 'count': Product.query.filter_by(category='Mobiles').count()},
+        {'name': 'Audio', 'slug': 'Audio', 'image': 'images/categories/audio.jpg', 'count': Product.query.filter_by(category='Audio').count()},
+        {'name': 'Accessories', 'slug': 'Accessories', 'image': 'images/categories/accessories.jpg', 'count': Product.query.filter_by(category='Accessories').count()},
+        {'name': 'Monitors', 'slug': 'Monitors', 'image': 'images/categories/monitors.jpg', 'count': Product.query.filter_by(category='Monitors').count()},
+        {'name': 'Wearables', 'slug': 'Wearables', 'image': 'images/categories/wearables.jpg', 'count': Product.query.filter_by(category='Wearables').count()}
+    ]
+    return render_template(
+        'index.html', 
+        products=featured_products, 
+        featured_products=featured_products, 
+        bestsellers=bestsellers, 
+        categories_data=categories_data
+    )
 
 @main_bp.route('/products')
 def products():
@@ -26,13 +41,29 @@ def products():
         query = query.order_by(Product.price.asc())
     elif sort == 'price_high':
         query = query.order_by(Product.price.desc())
+    elif sort == 'rating':
+        query = query.order_by(Product.rating.desc())
     else:
-        query = query.order_by(Product.id.desc())
+        query = query.order_by(Product.id.asc())
         
     all_products = query.all()
-    categories = db.session.query(Product.category).distinct().all()
-    categories = [c[0] for c in categories]
-    return render_template('products.html', products=all_products, categories=categories, search=search)
+    
+    # Standard tech categories list, plus any additional from DB
+    base_cats = ['Laptops', 'Mobiles', 'Audio', 'Accessories', 'Monitors', 'Wearables']
+    db_cats = [c[0] for c in db.session.query(Product.category).distinct().all()]
+    for c in db_cats:
+        if c not in base_cats:
+            base_cats.append(c)
+            
+    return render_template(
+        'products.html', 
+        products=all_products, 
+        categories=base_cats, 
+        selected_category=category,
+        search=search,
+        selected_sort=sort,
+        total_count=len(all_products)
+    )
 
 @main_bp.route('/product/<int:id>')
 def product_detail(id):
@@ -157,4 +188,12 @@ def profile():
         db.session.commit()
         flash('Profile updated successfully', 'success')
         
-    return render_template('profile.html', user=current_user)
+    recent_orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).limit(5).all()
+    total_orders = Order.query.filter_by(user_id=current_user.id).count()
+    return render_template('profile.html', user=current_user, recent_orders=recent_orders, total_orders=total_orders)
+
+@main_bp.route('/dashboard')
+@login_required
+def dashboard():
+    user_orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()
+    return render_template('dashboard.html', user=current_user, orders=user_orders)

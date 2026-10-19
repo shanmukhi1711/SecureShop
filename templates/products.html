@@ -1,62 +1,231 @@
 {% extends "base.html" %}
+
+{% block title %}
+    {% if selected_category %}{{ selected_category }} - SecureShopy{% elif search %}Search results for "{{ search }}" - SecureShopy{% else %}All Products - SecureShopy{% endif %}
+{% endblock %}
+
 {% block content %}
-<div class="page-header">
-    <h1>All Products</h1>
+<!-- Catalogue Header Bar -->
+<div class="catalogue-header-bar">
+    <div class="container">
+        <div class="breadcrumbs">
+            <a href="{{ url_for('main.index') }}"><i class="fas fa-home"></i> Home</a>
+            <span>/</span>
+            <a href="{{ url_for('main.products') }}">Products</a>
+            {% if selected_category %}
+                <span>/</span>
+                <span style="color: var(--text-primary); font-weight: 600;">{{ selected_category }}</span>
+            {% elif search %}
+                <span>/</span>
+                <span style="color: var(--text-primary); font-weight: 600;">Search: "{{ search }}"</span>
+            {% endif %}
+        </div>
+
+        <div class="catalogue-title-row">
+            <div>
+                <h1 style="font-size: 2.25rem; font-weight: 800; color: #0f172a; margin-bottom: 0.25rem;">
+                    {% if selected_category %}
+                        {{ selected_category }}
+                    {% elif search %}
+                        Search Results for "{{ search }}"
+                    {% else %}
+                        All Products & Tech Gear
+                    {% endif %}
+                </h1>
+                <p style="color: var(--text-secondary); font-size: 0.9375rem;">
+                    Showing {{ total_count|default(products|length) }} items available in the store catalog
+                </p>
+            </div>
+            
+            {% if selected_category or search %}
+            <div>
+                <a href="{{ url_for('main.products') }}" class="btn btn-outline btn-sm">
+                    <i class="fas fa-rotate-left"></i> Reset All Filters
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
 </div>
-<div class="product-layout">
-    <aside class="sidebar">
-        <h3>Categories</h3>
-        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
-            <li><a href="{{ url_for('main.products') }}" style="color: var(--secondary); text-decoration: none;">All Categories</a></li>
-            {% for cat in categories %}
-            <li style="margin-top: 0.5rem;"><a href="{{ url_for('main.products', category=cat) }}" style="color: var(--secondary); text-decoration: none;">{{ cat }}</a></li>
-            {% endfor %}
-        </ul>
-    </aside>
-    <div class="products-main">
-        <div class="products-toolbar">
-            <form class="search-bar" action="{{ url_for('main.products') }}" method="GET" style="display: flex; gap: 0.5rem;">
-                <input type="text" name="search" placeholder="Search products..." value="{{ search or '' }}" style="padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px;">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
-            </form>
-            <div class="sort-by">
-                <form action="{{ url_for('main.products') }}" method="GET">
-                    <select name="sort" onchange="this.form.submit()" style="padding: 0.5rem; border-radius: 4px;">
-                        <option value="">Sort by: Newest</option>
-                        <option value="price_low">Price: Low to High</option>
-                        <option value="price_high">Price: High to Low</option>
-                    </select>
+
+<div class="container">
+    <div class="catalogue-layout">
+        <!-- Sidebar Filters -->
+        <aside class="filter-sidebar">
+            <div class="filter-group">
+                <div class="filter-group-title">Category</div>
+                <ul class="category-filter-list">
+                    <li class="category-filter-item">
+                        <a href="{{ url_for('main.products', search=search, sort=selected_sort) }}" class="category-filter-link {% if not selected_category %}active{% endif %}">
+                            <span><i class="fas fa-border-all" style="width: 18px;"></i> All Categories</span>
+                        </a>
+                    </li>
+                    {% for cat in categories %}
+                    <li class="category-filter-item">
+                        <a href="{{ url_for('main.products', category=cat, search=search, sort=selected_sort) }}" class="category-filter-link {% if selected_category == cat %}active{% endif %}">
+                            <span>
+                                {% if cat == 'Laptops' %}<i class="fas fa-laptop" style="width: 18px;"></i>
+                                {% elif cat == 'Mobiles' %}<i class="fas fa-mobile-screen" style="width: 18px;"></i>
+                                {% elif cat == 'Audio' %}<i class="fas fa-headphones" style="width: 18px;"></i>
+                                {% elif cat == 'Monitors' %}<i class="fas fa-display" style="width: 18px;"></i>
+                                {% elif cat == 'Wearables' %}<i class="fas fa-clock" style="width: 18px;"></i>
+                                {% else %}<i class="fas fa-box" style="width: 18px;"></i>
+                                {% endif %}
+                                {{ cat }}
+                            </span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div class="filter-group">
+                <div class="filter-group-title">Filter by Search</div>
+                <form action="{{ url_for('main.products') }}" method="GET" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                    {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+                    {% if selected_sort %}<input type="hidden" name="sort" value="{{ selected_sort }}">{% endif %}
+                    <input 
+                        type="text" 
+                        name="search" 
+                        class="form-control" 
+                        placeholder="Keyword or model..." 
+                        value="{{ search or '' }}"
+                    >
+                    <button type="submit" class="btn btn-outline-primary btn-sm" style="width: 100%;">
+                        Apply Filter
+                    </button>
                 </form>
             </div>
-        </div>
-        <div class="product-grid">
-            {% for product in products %}
-            <div class="product-card">
-                <div class="product-image-placeholder">
-                    <i class="fas fa-box"></i>
-                </div>
-                <div class="product-info">
-                    <span class="product-category">{{ product.category }}</span>
-                    <h3 class="product-title">{{ product.name }}</h3>
-                    <div class="product-rating">
-                        <i class="fas fa-star"></i> {{ product.rating }}
+
+            <div class="filter-group" style="border-bottom: none; margin-bottom: 0;">
+                <div style="background: var(--bg-subtle); padding: 1rem; border-radius: var(--radius-md); font-size: 0.8125rem; color: var(--text-secondary);">
+                    <div style="font-weight: 700; color: #0f172a; margin-bottom: 0.35rem;">
+                        <i class="fas fa-shield-halved" style="color: var(--primary);"></i> Secure Guarantee
                     </div>
-                    <div class="product-bottom">
-                        <span class="product-price">${{ "%.2f"|format(product.price) }}</span>
-                        <a href="{{ url_for('main.product_detail', id=product.id) }}" class="btn btn-outline btn-sm">View</a>
-                        <form action="{{ url_for('main.add_to_cart', product_id=product.id) }}" method="POST" style="display:inline;">
-                            <input type="hidden" name="quantity" value="1">
-                            <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-cart-plus"></i></button>
-                        </form>
+                    Every order includes 100% authentic manufacturer warranty and 30-day hassle-free replacement.
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Products Display Area -->
+        <main class="catalogue-content">
+            <!-- Toolbar -->
+            <div class="catalogue-toolbar">
+                <div style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500;">
+                    Found <strong style="color: #0f172a;">{{ products|length }}</strong> matching products
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <label for="sortDropdown" style="font-size: 0.875rem; color: var(--text-secondary); font-weight: 500;">Sort By:</label>
+                    <form action="{{ url_for('main.products') }}" method="GET" id="sortForm">
+                        {% if search %}<input type="hidden" name="search" value="{{ search }}">{% endif %}
+                        {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+                        <select name="sort" id="sortDropdown" class="sort-select" onchange="document.getElementById('sortForm').submit();">
+                            <option value="" {% if not selected_sort %}selected{% endif %}>Featured & Newest</option>
+                            <option value="price_low" {% if selected_sort == 'price_low' %}selected{% endif %}>Price: Low to High</option>
+                            <option value="price_high" {% if selected_sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+                            <option value="rating" {% if selected_sort == 'rating' %}selected{% endif %}>Top Rated</option>
+                        </select>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Product Grid -->
+            {% if products %}
+            <div class="product-grid" style="grid-template-columns: repeat(3, 1fr);">
+                {% for product in products %}
+                <div class="product-card" id="productItem-{{ product.id }}">
+                    <div class="product-card-thumb">
+                        <div class="card-badge-top-left">
+                            <span class="badge badge-blue">{{ product.category }}</span>
+                        </div>
+                        {% if product.stock > 0 and product.stock <= 20 %}
+                        <div class="card-badge-top-right">
+                            <span class="badge badge-amber">Only {{ product.stock }} left</span>
+                        </div>
+                        {% elif product.rating >= 4.8 %}
+                        <div class="card-badge-top-right">
+                            <span class="badge badge-green">Top Rated</span>
+                        </div>
+                        {% endif %}
+                        <a href="{{ url_for('main.product_detail', id=product.id) }}" style="display: contents;">
+                            <img 
+                                src="{{ url_for('static', filename=product.image_path) }}" 
+                                alt="{{ product.name }}" 
+                                class="product-card-img"
+                                onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/fallback.jpg') }}';"
+                            >
+                        </a>
+                    </div>
+
+                    <div class="product-card-body">
+                        <span class="product-card-cat">{{ product.category }}</span>
+                        <a href="{{ url_for('main.product_detail', id=product.id) }}" class="product-card-title" title="{{ product.name }}">
+                            {{ product.name }}
+                        </a>
+                        
+                        <div class="product-rating">
+                            <span class="rating-stars">
+                                {% for i in range(5) %}
+                                    {% if product.rating >= i + 1 %}
+                                        <i class="fas fa-star"></i>
+                                    {% elif product.rating >= i + 0.5 %}
+                                        <i class="fas fa-star-half-alt"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </span>
+                            <span class="rating-value">{{ product.rating }}</span>
+                        </div>
+
+                        <p class="product-card-desc">{{ product.description }}</p>
+
+                        <div class="product-card-price-row">
+                            <div class="product-price">{{ product.price|inr }}</div>
+                            <div class="product-stock-tag">
+                                {% if product.stock > 0 %}
+                                    <span class="stock-in">In Stock</span>
+                                {% else %}
+                                    <span class="stock-out">Out of Stock</span>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="product-card-actions">
+                            <form action="{{ url_for('main.add_to_cart', product_id=product.id) }}" method="POST" style="display: contents;">
+                                <input type="hidden" name="quantity" value="1">
+                                <button type="submit" class="btn-add-cart" id="catAddToCartBtn-{{ product.id }}" {% if product.stock <= 0 %}disabled{% endif %}>
+                                    <i class="fas fa-cart-plus"></i> Add to Cart
+                                </button>
+                            </form>
+                            <a href="{{ url_for('main.product_detail', id=product.id) }}" class="btn-view-details" title="View Full Specs">
+                                <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
+                {% endfor %}
             </div>
             {% else %}
-            <div class="empty-state">
-                <h2>No products found</h2>
+            <!-- Empty State -->
+            <div class="empty-state-box">
+                <div class="empty-state-icon">
+                    <i class="fas fa-magnifying-glass"></i>
+                </div>
+                <h3>No Matching Products Found</h3>
+                <p>We couldn't find any items matching your search or active filter criteria. Try adjusting your query or browse our featured collections.</p>
+                <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <a href="{{ url_for('main.products') }}" class="btn btn-primary">
+                        <i class="fas fa-boxes-stacked"></i> View All Products
+                    </a>
+                    <a href="{{ url_for('main.index') }}" class="btn btn-outline">
+                        Back to Homepage
+                    </a>
+                </div>
             </div>
-            {% endfor %}
-        </div>
+            {% endif %}
+        </main>
     </div>
 </div>
 {% endblock %}

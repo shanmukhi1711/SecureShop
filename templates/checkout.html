@@ -1,24 +1,131 @@
 {% extends "base.html" %}
+
+{% block title %}Checkout - SecureShopy{% endblock %}
+
 {% block content %}
-<div class="page-header"><h1>Checkout</h1></div>
-<div class="container" style="max-width: 600px; margin: 0 auto; padding: 2rem;">
-    <h3>Order Summary</h3>
-    <ul>
-        {% for item in items %}
-        <li>{{ item.product.name }} x {{ item.quantity }} - ${{ "%.2f"|format(item.product.price * item.quantity) }}</li>
-        {% endfor %}
-    </ul>
-    <h2>Total: ${{ "%.2f"|format(total) }}</h2>
-    <hr>
-    <form method="POST">
-        <h3>Shipping Information</h3>
-        <input type="text" placeholder="Full Name" required style="width: 100%; margin-bottom: 1rem; padding: 0.5rem;">
-        <input type="text" placeholder="Address" required style="width: 100%; margin-bottom: 1rem; padding: 0.5rem;">
-        <select required style="width: 100%; margin-bottom: 1rem; padding: 0.5rem;">
-            <option value="cod">Cash on Delivery</option>
-            <option value="demo">Demo Card</option>
-        </select>
-        <button type="submit" class="btn btn-primary btn-large" style="width: 100%;">Place Order</button>
-    </form>
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 4rem;">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="{{ url_for('main.index') }}"><i class="fas fa-home"></i> Home</a>
+        <span>/</span>
+        <a href="{{ url_for('main.cart') }}">Cart</a>
+        <span>/</span>
+        <span style="color: var(--text-primary); font-weight: 600;">Secure Checkout</span>
+    </div>
+
+    <div style="margin-bottom: 2rem;">
+        <h1 style="font-size: 2.25rem; font-weight: 800; color: #0f172a;">Complete Your Order</h1>
+        <p style="color: var(--text-secondary); font-size: 0.9375rem;">
+            Please provide your delivery destination and select a payment preference.
+        </p>
+    </div>
+
+    <div class="cart-layout">
+        <!-- Checkout Form (Left Column) -->
+        <div style="background: #ffffff; border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-xs);">
+            <form method="POST" action="{{ url_for('main.checkout') }}" id="checkoutForm">
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-location-dot" style="color: var(--primary);"></i> 1. Shipping Address
+                    </h3>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="full_name" class="form-control" value="{{ current_user.name }}" placeholder="Recipient Full Name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Street Address & Landmark</label>
+                        <input type="text" name="address" class="form-control" placeholder="House/Flat No, Building, Street, Landmark" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">City</label>
+                            <input type="text" name="city" class="form-control" placeholder="e.g. Bengaluru / Mumbai" required value="Bengaluru">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">PIN Code</label>
+                            <input type="text" name="pincode" class="form-control" placeholder="6-digit PIN" required value="560001">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Contact Phone Number</label>
+                        <input type="tel" name="phone" class="form-control" placeholder="10-digit Mobile Number" required value="+91 98765 43210">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border-light);">
+                    <h3 style="font-size: 1.15rem; font-weight: 700; color: #0f172a; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-credit-card" style="color: var(--primary);"></i> 2. Payment Method
+                    </h3>
+
+                    <div class="form-group">
+                        <label class="form-label">Select Payment Option</label>
+                        <select name="payment" class="form-control" style="font-weight: 600;" required>
+                            <option value="cod" selected>Cash on Delivery (Pay when delivered)</option>
+                            <option value="demo">Demo Credit / Debit Card (Instant Test Approval)</option>
+                            <option value="upi">UPI / QR Code Demo Transfer</option>
+                        </select>
+                    </div>
+
+                    <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1rem; font-size: 0.8125rem; color: var(--text-secondary); display: flex; gap: 0.75rem; align-items: center;">
+                        <i class="fas fa-lock" style="color: var(--success); font-size: 1.25rem;"></i>
+                        <div>
+                            <strong>Academic Lab Simulated Checkout</strong><br>
+                            This is an authorized secure testing platform. No real financial charges are made.
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;" id="placeOrderSubmitBtn">
+                    <i class="fas fa-check"></i> Place Order ({{ total|inr }})
+                </button>
+            </form>
+        </div>
+
+        <!-- Order Summary Side Card (Right Column) -->
+        <div class="order-summary-card">
+            <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem; color: #0f172a;">Review Items</h3>
+
+            <div style="max-height: 320px; overflow-y: auto; margin-bottom: 1.5rem; padding-right: 0.25rem;">
+                {% for item in items %}
+                <div style="display: flex; gap: 0.875rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-light);">
+                    <img 
+                        src="{{ url_for('static', filename=item.product.image_path) }}" 
+                        alt="{{ item.product.name }}" 
+                        style="width: 55px; height: 55px; border-radius: var(--radius-sm); border: 1px solid var(--border-light); object-fit: contain; padding: 0.2rem; background: #ffffff;"
+                        onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/fallback.jpg') }}';"
+                    >
+                    <div style="flex: 1;">
+                        <div style="font-size: 0.875rem; font-weight: 600; color: #0f172a; line-height: 1.3;">{{ item.product.name }}</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Qty: {{ item.quantity }} × {{ item.product.price|inr }}</div>
+                    </div>
+                    <div style="font-size: 0.875rem; font-weight: 700; color: #0f172a;">
+                        {{ (item.product.price * item.quantity)|inr }}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <span style="font-weight: 600; color: #0f172a;">{{ total|inr }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Delivery Charges</span>
+                <span style="color: var(--success); font-weight: 700;">FREE</span>
+            </div>
+            <div class="summary-total-row">
+                <span>Order Total</span>
+                <span style="color: var(--primary);">{{ total|inr }}</span>
+            </div>
+
+            <div style="margin-top: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--text-muted);">
+                <i class="fas fa-shield-halved" style="color: var(--primary);"></i> Encrypted Transaction Guard Active
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

@@ -41,6 +41,7 @@ def add_product():
             price=float(request.form.get('price')),
             category=request.form.get('category'),
             stock=int(request.form.get('stock')),
+            image_url=request.form.get('image_url') or 'fallback.jpg',
             rating=float(request.form.get('rating', 0))
         )
         db.session.add(p)
@@ -59,6 +60,7 @@ def edit_product(id):
         product.price = float(request.form.get('price'))
         product.category = request.form.get('category')
         product.stock = int(request.form.get('stock'))
+        product.image_url = request.form.get('image_url') or product.image_url
         product.rating = float(request.form.get('rating', 0))
         db.session.commit()
         flash('Product updated successfully', 'success')
@@ -88,3 +90,9 @@ def update_order_status(id):
     db.session.commit()
     flash('Order status updated', 'success')
     return redirect(url_for('admin.orders'))
+
+@admin_bp.route('/users')
+@admin_required
+def users():
+    all_users = User.query.order_by(User.id.asc()).all()
+    return render_template('admin/users.html', users=all_users)

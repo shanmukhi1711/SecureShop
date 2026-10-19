@@ -1,29 +1,137 @@
 {% extends "base.html" %}
+
+{% block title %}Shopping Cart - SecureShopy{% endblock %}
+
 {% block content %}
-<div class="page-header"><h1>Shopping Cart</h1></div>
-<div class="container" style="max-width: 800px; margin: 0 auto; padding: 2rem;">
+<div class="container" style="padding-top: 2.5rem; padding-bottom: 4rem;">
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs">
+        <a href="{{ url_for('main.index') }}"><i class="fas fa-home"></i> Home</a>
+        <span>/</span>
+        <span style="color: var(--text-primary); font-weight: 600;">Shopping Cart</span>
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2rem;">
+        <h1 style="font-size: 2.25rem; font-weight: 800; color: #0f172a;">Your Shopping Cart</h1>
+        <a href="{{ url_for('main.products') }}" class="btn btn-outline btn-sm">
+            <i class="fas fa-arrow-left"></i> Continue Shopping
+        </a>
+    </div>
+
     {% if items %}
-        <table style="width: 100%; text-align: left; border-collapse: collapse;">
-            <tr><th>Product</th><th>Price</th><th>Quantity</th><th>Total</th><th>Action</th></tr>
-            {% for item in items %}
-            <tr style="border-bottom: 1px solid #ccc;">
-                <td style="padding: 1rem 0;">{{ item.product.name }}</td>
-                <td>${{ "%.2f"|format(item.product.price) }}</td>
-                <td>{{ item.quantity }}</td>
-                <td>${{ "%.2f"|format(item.product.price * item.quantity) }}</td>
-                <td><a href="{{ url_for('main.remove_from_cart', item_id=item.id) }}" class="btn btn-outline btn-sm">Remove</a></td>
-            </tr>
-            {% endfor %}
-        </table>
-        <div style="text-align: right; margin-top: 2rem;">
-            <h3>Total: ${{ "%.2f"|format(total) }}</h3>
-            <a href="{{ url_for('main.checkout') }}" class="btn btn-primary btn-large">Proceed to Checkout</a>
+    <div class="cart-layout">
+        <!-- Cart Items List -->
+        <div class="cart-items-card">
+            <table class="cart-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th style="text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr id="cartItemRow-{{ item.id }}">
+                        <td>
+                            <div class="cart-product-cell">
+                                <img 
+                                    src="{{ url_for('static', filename=item.product.image_path) }}" 
+                                    alt="{{ item.product.name }}" 
+                                    class="cart-thumb"
+                                    onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/fallback.jpg') }}';"
+                                >
+                                <div>
+                                    <a href="{{ url_for('main.product_detail', id=item.product.id) }}" class="cart-item-name">
+                                        {{ item.product.name }}
+                                    </a>
+                                    <span class="cart-item-cat">{{ item.product.category }}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td style="font-weight: 600; color: #0f172a;">
+                            {{ item.product.price|inr }}
+                        </td>
+                        <td>
+                            <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: var(--bg-subtle); padding: 0.35rem 0.75rem; border-radius: var(--radius-sm); border: 1px solid var(--border); font-weight: 700;">
+                                <span>{{ item.quantity }}</span>
+                            </div>
+                        </td>
+                        <td style="font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; color: var(--primary); font-size: 1.05rem;">
+                            {{ (item.product.price * item.quantity)|inr }}
+                        </td>
+                        <td style="text-align: right;">
+                            <a href="{{ url_for('main.remove_from_cart', item_id=item.id) }}" class="btn btn-outline btn-sm" style="color: var(--danger); border-color: #fecaca;" title="Remove from cart">
+                                <i class="fas fa-trash-can"></i> Remove
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <div style="padding: 1.25rem 1.5rem; background: var(--bg-subtle); border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 0.875rem; color: var(--text-secondary);">
+                    <i class="fas fa-shield-halved" style="color: var(--primary);"></i> Items in cart are reserved for 60 minutes
+                </span>
+                <span style="font-size: 0.875rem; font-weight: 600;">
+                    Total Items: {{ items|sum(attribute='quantity') }}
+                </span>
+            </div>
         </div>
+
+        <!-- Order Summary Side Card -->
+        <div class="order-summary-card">
+            <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 1.25rem; color: #0f172a;">Order Summary</h3>
+            
+            <div class="summary-row">
+                <span>Subtotal ({{ items|length }} unique items)</span>
+                <span style="font-weight: 600; color: #0f172a;">{{ total|inr }}</span>
+            </div>
+            <div class="summary-row">
+                <span>Estimated Shipping</span>
+                <span style="color: var(--success); font-weight: 700;">FREE</span>
+            </div>
+            <div class="summary-row">
+                <span>Tax & Compliance Fee</span>
+                <span style="color: var(--text-muted);">Included</span>
+            </div>
+
+            <div class="summary-total-row">
+                <span>Total Amount</span>
+                <span style="color: var(--primary);">{{ total|inr }}</span>
+            </div>
+
+            <div style="margin-top: 1.75rem;">
+                <a href="{{ url_for('main.checkout') }}" class="btn btn-primary btn-lg" style="width: 100%;" id="proceedToCheckoutBtn">
+                    <i class="fas fa-lock"></i> Proceed to Checkout
+                </a>
+            </div>
+
+            <div style="margin-top: 1.5rem; text-align: center; font-size: 0.8125rem; color: var(--text-muted); display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                <i class="fas fa-shield-check" style="color: var(--primary);"></i> 256-Bit SSL Encrypted & Protected
+            </div>
+        </div>
+    </div>
     {% else %}
-        <div style="text-align: center;">
-            <h2>Your cart is empty</h2>
-            <a href="{{ url_for('main.products') }}" class="btn btn-primary">Continue Shopping</a>
+    <!-- Empty Cart State -->
+    <div class="empty-state-box" style="margin: 2rem 0;">
+        <div class="empty-state-icon">
+            <i class="fas fa-bag-shopping"></i>
         </div>
+        <h2>Your Cart is Currently Empty</h2>
+        <p>Looks like you haven't added any tech products to your shopping bag yet. Explore our curated collections of laptops, smartphones, monitors, and accessories.</p>
+        <div style="display: flex; gap: 1rem; justify-content: center;">
+            <a href="{{ url_for('main.products') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-compass"></i> Explore Products
+            </a>
+            <a href="{{ url_for('main.index') }}" class="btn btn-outline btn-lg">
+                Return to Homepage
+            </a>
+        </div>
+    </div>
     {% endif %}
 </div>
 {% endblock %}

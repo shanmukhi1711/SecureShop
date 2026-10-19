@@ -3,47 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - SecureShop</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <title>{% block title %}Admin Control Center - SecureShopy{% endblock %}</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Style -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        .admin-layout { display: flex; min-height: 100vh; }
-        .admin-sidebar { width: 250px; background: #1e293b; color: white; padding: 2rem 1rem; }
-        .admin-sidebar a { color: #cbd5e1; display: block; padding: 1rem; text-decoration: none; border-radius: 8px; margin-bottom: 0.5rem; }
-        .admin-sidebar a:hover, .admin-sidebar a.active { background: #334155; color: white; }
-        .admin-main { flex: 1; padding: 2rem; background: #f8fafc; overflow-y: auto; }
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .stat-card { background: white; padding: 1.5rem; border-radius: 8px; border: 1px solid #e2e8f0; text-align: center; }
-        .stat-card h3 { font-size: 2rem; color: var(--primary); margin-top: 0.5rem; }
-        .admin-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .admin-table th, .admin-table td { padding: 1rem; text-align: left; border-bottom: 1px solid #e2e8f0; }
-        .admin-table th { background: #f1f5f9; font-weight: 600; }
-    </style>
+    {% block extra_head %}{% endblock %}
 </head>
 <body>
     <div class="admin-layout">
+        <!-- Dark Navy Sidebar -->
         <aside class="admin-sidebar">
-            <h2 style="padding: 0 1rem; margin-bottom: 2rem; color: white;">Admin Panel</h2>
-            <nav>
-                <a href="{{ url_for('admin.dashboard') }}"><i class="fas fa-chart-line"></i> Dashboard</a>
-                <a href="{{ url_for('admin.products') }}"><i class="fas fa-box"></i> Products</a>
-                <a href="{{ url_for('admin.orders') }}"><i class="fas fa-shopping-cart"></i> Orders</a>
-                <a href="{{ url_for('main.index') }}"><i class="fas fa-home"></i> Back to Store</a>
+            <div class="admin-sidebar-brand">
+                <div class="brand-icon" style="width: 32px; height: 32px; font-size: 0.9rem;">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <span>SECURE<span style="color: var(--primary);">SHOPY</span></span>
+            </div>
+
+            <nav class="admin-nav">
+                <a href="{{ url_for('admin.dashboard') }}" class="admin-nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+                    <i class="fas fa-chart-line" style="width: 20px;"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="{{ url_for('admin.products') }}" class="admin-nav-link {% if 'admin.product' in request.endpoint %}active{% endif %}">
+                    <i class="fas fa-box" style="width: 20px;"></i>
+                    <span>Products</span>
+                </a>
+                <a href="{{ url_for('admin.orders') }}" class="admin-nav-link {% if request.endpoint == 'admin.orders' %}active{% endif %}">
+                    <i class="fas fa-shopping-cart" style="width: 20px;"></i>
+                    <span>Orders</span>
+                </a>
+                <a href="{{ url_for('admin.users') }}" class="admin-nav-link {% if request.endpoint == 'admin.users' %}active{% endif %}">
+                    <i class="fas fa-users" style="width: 20px;"></i>
+                    <span>Users</span>
+                </a>
+                <a href="{{ url_for('lab.index') }}" class="admin-nav-link">
+                    <i class="fas fa-flask" style="width: 20px;"></i>
+                    <span>Security Lab</span>
+                </a>
             </nav>
+
+            <div style="border-top: 1px solid #1e293b; padding-top: 1.25rem; margin-top: auto; display: flex; flex-direction: column; gap: 0.5rem;">
+                <a href="{{ url_for('main.index') }}" class="admin-nav-link">
+                    <i class="fas fa-arrow-up-right-from-square" style="width: 20px;"></i>
+                    <span>View Storefront</span>
+                </a>
+                <a href="{{ url_for('auth.logout') }}" class="admin-nav-link" style="color: #f87171;">
+                    <i class="fas fa-arrow-right-from-bracket" style="width: 20px;"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
         </aside>
+
+        <!-- Main Workspace -->
         <main class="admin-main">
-            <div class="flash-messages">
+            <!-- Topbar -->
+            <header class="admin-topbar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <span style="font-size: 0.8125rem; color: var(--text-muted); font-weight: 500;">
+                        SecureShopy Administration & Security Management Console
+                    </span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <a href="{{ url_for('main.index') }}" class="btn btn-outline btn-sm">
+                        <i class="fas fa-store"></i> Live Store
+                    </a>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 600; color: #0f172a; background: var(--bg-subtle); padding: 0.35rem 0.75rem; border-radius: var(--radius-full); border: 1px solid var(--border);">
+                        <i class="fas fa-user-shield" style="color: var(--primary);"></i>
+                        <span>{{ current_user.username }}</span>
+                        <span class="badge badge-blue" style="font-size: 0.65rem;">ADMIN</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Content Area -->
+            <div class="admin-content-area">
+                <!-- Flash Messages in Admin -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                            <div class="alert alert-{{ category }}">
+                                <i class="fas fa-circle-info"></i>
+                                <span>{{ message }}</span>
+                            </div>
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
+
+                {% block content %}{% endblock %}
             </div>
-            {% block content %}{% endblock %}
         </main>
     </div>
+
+    {% block extra_scripts %}{% endblock %}
 </body>
 </html>

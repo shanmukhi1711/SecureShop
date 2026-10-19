@@ -1,14 +1,93 @@
 {% extends "base.html" %}
+
+{% block title %}Create Account - SecureShopy{% endblock %}
+
 {% block content %}
-<div style="max-width: 400px; margin: 4rem auto; text-align: center;">
-    <h2>Create Account</h2>
-    <form method="POST">
-        <input type="text" name="name" placeholder="Full Name" required style="width: 100%; margin-bottom: 1rem; padding: 0.5rem;">
-        <input type="email" name="email" placeholder="Email" required style="width: 100%; margin-bottom: 1rem; padding: 0.5rem;">
-        <input type="text" name="username" placeholder="Username" required style="width: 100%; margin-bottom: 1rem; padding: 0.5rem;">
-        <input type="password" name="password" placeholder="Password" required style="width: 100%; margin-bottom: 1rem; padding: 0.5rem;">
-        <input type="password" name="confirm_password" placeholder="Confirm Password" required style="width: 100%; margin-bottom: 1rem; padding: 0.5rem;">
-        <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
-    </form>
+<div class="auth-wrapper">
+    <div class="auth-card" style="max-width: 480px;">
+        <div class="auth-header">
+            <div class="brand-icon">
+                <i class="fas fa-shield-halved"></i>
+            </div>
+            <h2>Create Your Account</h2>
+            <p>Join SecureShopy for premium electronics and secure checkout</p>
+        </div>
+
+        <form method="POST" action="{{ url_for('auth.register') }}" id="registerForm">
+            <div class="form-group">
+                <label class="form-label" for="regName">Full Name</label>
+                <input 
+                    type="text" 
+                    name="name" 
+                    id="regName" 
+                    class="form-control" 
+                    placeholder="e.g. Shanmukhi Sree" 
+                    required 
+                    autofocus
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="regEmail">Email Address</label>
+                <input 
+                    type="email" 
+                    name="email" 
+                    id="regEmail" 
+                    class="form-control" 
+                    placeholder="name@example.com" 
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="regUsername">Username</label>
+                <input 
+                    type="text" 
+                    name="username" 
+                    id="regUsername" 
+                    class="form-control" 
+                    placeholder="Choose a username" 
+                    required
+                >
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" for="regPass">Password</label>
+                    <input 
+                        type="password" 
+                        name="password" 
+                        id="regPass" 
+                        class="form-control" 
+                        placeholder="Create password" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="regConfirmPass">Confirm Password</label>
+                    <input 
+                        type="password" 
+                        name="confirm_password" 
+                        id="regConfirmPass" 
+                        class="form-control" 
+                        placeholder="Repeat password" 
+                        required
+                    >
+                </div>
+            </div>
+
+            <div style="margin-top: 1.75rem;">
+                <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;" id="registerSubmitBtn">
+                    <i class="fas fa-user-plus"></i> Register
+                </button>
+            </div>
+        </form>
+
+        <div style="text-align: center; margin-top: 1.5rem; font-size: 0.875rem; color: var(--text-secondary);">
+            Already have an account? 
+            <a href="{{ url_for('auth.login') }}" style="font-weight: 600; color: var(--primary);">Sign in here</a>
+        </div>
+    </div>
 </div>
 {% endblock %}
